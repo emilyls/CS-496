@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Cider Tracker</title>
+    <link rel="stylesheet" href="/bootstrap/css/bootstrap.css">
+</head>
+<body>
+    <div class="col-md-4 col-md-offset-4">
+        <h2>Add Cider</h2>
+        <form action="/" method="post" class="form-horizontal">
+            <input type="hidden" name="action" value="add_cider">
+            <div class="form-group">
+                <label>Cider Name: </label>
+                <input type="text" class="form-control" name="cider_name">
+            </div>
+            <div class="form-group form-inline">
+                <label>Rating</label>
+                <div class="radio">
+                    <label>
+                        <input type="radio" name="rating" value="amazing">
+                        Amazing
+                    </label>
+                </div>
+                <div class="radio">
+                    <label>
+                        <input type="radio" name="rating" value="good">
+                        Good
+                    </label>
+                </div>
+                <div class="radio">
+                    <label>
+                        <input type="radio" name="rating" value="drinkable">
+                        Drinkable
+                    </label>
+                </div>
+                <div class="radio">
+                    <label>
+                        <input type="radio" name="rating" value="terrible">
+                        Terrible
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Notes:</label>
+                <textarea name="notes" class="form-control"></textarea>
+            </div>
+            <div class="form-group form-inline">
+                <label>Size:</label>
+                <input type="number" class="form-control" name="size">
+                <label>Units:</label>
+                <input type="text" class="form-control" name="unit">
+            </div>
+            <div class="form-group">
+                <label>Best Price:</label>
+                <div class="input-group">
+                    <div class="input-group-addon">$</div>
+                    <input type="number" step='0.01' class="form-control" name="price">
+                </div>
+            </div>
+            <div class="form-group">
+            <label>Stores</label>
+            {% if stores|length > 0 %}
+                {% for s in stores %}
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" name="stores[]" value="{{ s.key }}">
+                        {{ s.name }}
+                    </label>
+                </div>
+                {% endfor %}
+            {% endif %}
+            </div>
+            <input type="submit" class="btn btn-primary" value="Add">
+        </form>
+        <h2>Add Store</h2>
+        <form action="/" method="post" class="form-horizontal">
+            <input type="hidden" name="action" value="add_store">
+            <div class="form-group">
+                <lable>Store Name</lable>
+                <input type="text" class="form-control" name="store_name">
+            </div>
+            <input type="submit" class="btn btn-primary" value="Add">
+        </form>
+        {% if message %}
+        <hr>
+        <section>
+            <h3>Result</h3>
+            <p>{{ message }}</p>
+        </section>
+        {% endif %}
+        <hr>
+        {% if ciders|length > 0 %}
+        <section>
+            <table class="table table-striped">
+                {% for c in ciders %}
+                <tr>
+                    <td>{{ c.name }}</td>
+                    <td><a class="btn btn-info" href='/view?key={{ c.key }}&type=cider'>View</a></td>
+                    <td><a class="btn btn-success" href='/edit?key={{ c.key }}&type=cider'>Edit</a></td>
+                </tr>
+                {% endfor %}
+            </table>
+        </section>
+        {% endif %}
+    </div>
+
+</body>
+</html>

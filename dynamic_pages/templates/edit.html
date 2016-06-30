@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Cider Tracker</title>
+    <link rel="stylesheet" href="/bootstrap/css/bootstrap.css">
+</head>
+<body>
+    <div class="col-md-4 col-md-offset-4">
+        <h2>Edit Cider</h2>
+        <form action="/" method="post" class="form-horizontal">
+            <input type="hidden" name="action" value="edit">
+            <input type="hidden" name="key" value="{{ cider.key.urlsafe() }}">
+            <div class="form-group">
+                <label>Cider Name: </label>
+                <input type="text" class="form-control" name="cider_name" value="{{ cider.name }}">
+            </div>
+            <div class="form-group form-inline">
+                <label>Rating</label>
+                <div class="radio">
+                    <label>
+                        <input type="radio" name="rating" value="amazing" {% if cider.rating == 'amazing' %} checked {% endif %}>
+                        Amazing
+                    </label>
+                </div>
+                <div class="radio">
+                    <label>
+                        <input type="radio" name="rating" value="good" {% if cider.rating == 'good' %} checked {% endif %}>
+                        Good
+                    </label>
+                </div>
+                <div class="radio">
+                    <label>
+                        <input type="radio" name="rating" value="drinkable" {% if cider.rating == 'drinkable' %} checked {% endif %}>
+                        Drinkable
+                    </label>
+                </div>
+                <div class="radio">
+                    <label>
+                        <input type="radio" name="rating" value="terrible" {% if cider.rating == 'terrible' %} checked {% endif %}>
+                        Terrible
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Notes:</label>
+                <textarea name="notes" class="form-control" value="notes">{{ cider.notes }}</textarea>
+            </div>
+            <div class="form-group form-inline">
+                <label>Size:</label>
+                <input type="number" class="form-control" name="size" value="{{ cider.size }}">
+                <label>Units:</label>
+                <input type="text" class="form-control" name="unit" value="{{ cider.unit }}">
+            </div>
+            <div class="form-group">
+                <label>Best Price:</label>
+                <div class="input-group">
+                    <div class="input-group-addon">$</div>
+                    <input type="number"  step='0.01' placeholder='0.00' class="form-control" name="price" value="{{ cider.price }}">
+                </div>
+            </div>
+            <div class="form-group">
+            <label>Stores</label>
+            {% if stores|length > 0 %}
+                {% for s in stores %}
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" name="stores[]" value="{{ s.key }}" {% if s.checked %} checked {% endif %}>
+                        {{ s.name }}
+                    </label>
+                </div>
+                {% endfor %}
+            {% endif %}
+            </div>
+            <input type="submit" class="btn btn-primary" value="Submit Changes">
+        </form>
+        <form action="/" method="get" class="form-horizontal">
+            <input type="hidden" name="action" value="cancel">
+            <input type="submit" class="btn btn-danger" value="Cancel">
+        </form>
+    </div>
+</body>
+</html>
