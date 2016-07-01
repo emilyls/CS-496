@@ -19,25 +19,25 @@
                 <label>Rating</label>
                 <div class="radio">
                     <label>
-                        <input type="radio" name="rating" value="amazing" readonly {% if cider.rating == 'amazing' %} checked {% endif %}>
+                        <input type="radio" name="rating" value="amazing" disabled {% if cider.rating == 'amazing' %} checked {% endif %}>
                         Amazing
                     </label>
                 </div>
                 <div class="radio">
                     <label>
-                        <input type="radio" name="rating" value="good" readonly {% if cider.rating == 'good' %} checked {% endif %}>
+                        <input type="radio" name="rating" value="good" disabled {% if cider.rating == 'good' %} checked {% endif %}>
                         Good
                     </label>
                 </div>
                 <div class="radio">
                     <label>
-                        <input type="radio" name="rating" value="drinkable" readonly {% if cider.rating == 'drinkable' %} checked {% endif %}>
+                        <input type="radio" name="rating" value="drinkable" disabled {% if cider.rating == 'drinkable' %} checked {% endif %}>
                         Drinkable
                     </label>
                 </div>
                 <div class="radio">
                     <label>
-                        <input type="radio" name="rating" value="terrible" readonly {% if cider.rating == 'terrible' %} checked {% endif %}>
+                        <input type="radio" name="rating" value="terrible" disabled {% if cider.rating == 'terrible' %} checked {% endif %}>
                         Terrible
                     </label>
                 </div>
@@ -65,14 +65,15 @@
                 {% for s in stores %}
                 <div class="checkbox">
                     <label>
-                        <input type="checkbox" name="stores[]" value="{{ s.key }}" readonly {% if s.checked %} checked {% endif %}>
+                        <input type="checkbox" name="stores[]" value="{{ s.key }}" disabled {% if s.checked %} checked {% endif %}>
                         {{ s.name }}
                     </label>
                 </div>
                 {% endfor %}
             {% endif %}
             </div>
-            <input type="submit" class="btn btn-primary" value="Back">
+            <a href="/" class="btn btn-primary">Back</a>
+            <a class="btn btn-success" href='/edit?key={{ cider.key.urlsafe() }}&type=cider'>Edit</a>
         </form>
     </div>
 </body>

@@ -28,31 +28,54 @@ class Add(base_page.BaseHandler):
             cider.name = self.request.get('cider_name')
             cider.rating = self.request.get('rating')
             cider.notes = self.request.get('notes')
-            cider.size = int(self.request.get('size'))
+            size = self.request.get('size')
             cider.unit = self.request.get('unit')
-            cider.price = float(self.request.get('price'))
+            price = self.request.get('price')
             cider.stores = [ndb.Key(urlsafe=x) for x in self.request.get_all('stores[]')]
             cider.active = True
-            cider.put()
-            self.template_values['message'] = 'Added ' + cider.name + ' to the database'
+            if cider.name and cider.rating and size and cider.unit and price and cider.stores:
+                cider.size = int(size)
+                cider.price = float(price)
+                cider.put()
+                self.template_values['message'] = 'Added your review of ' + cider.name
+            else:
+                # cider.size = size
+                # cider.price = price
+                # stores = db_defs.Store.query(ancestor=ndb.Key(db_defs.Store, self.app.config.get('default-group')))
+                # store_boxes = []
+                # for s in stores:
+                #     if s.key in cider.stores:
+                #         store_boxes.append({'name': s.name, 'key': s.key.urlsafe(), 'checked': True})
+                #     else:
+                #         store_boxes.append({'name': s.name, 'key': s.key.urlsafe(), 'checked': False})
+                # self.template_values['stores'] = store_boxes
+                # self.template_values['cider'] = cider
+                self.template_values['message'] = 'All fields must be complete except notes.'
         elif action == 'add_store':
             k = ndb.Key(db_defs.Store, self.app.config.get('default-group'))
             store = db_defs.Store(parent=k)
             store.name = self.request.get('store_name')
-            store.put()
-            self.template_values['message'] = 'Added ' + store.name + '(store) to the database'
+            if not store.name:
+                self.template_values['message'] = 'No store name was entered'
+            else:
+                store.put()
+                self.template_values['message'] = 'Added ' + store.name + ' the list of stores.'
         elif action == 'edit':
             cider_key = ndb.Key(urlsafe=self.request.get('key'))
             cider = cider_key.get()
             cider.name = self.request.get('cider_name')
             cider.rating = self.request.get('rating')
             cider.notes = self.request.get('notes')
-            cider.size = int(self.request.get('size'))
+            size = self.request.get('size')
             cider.unit = self.request.get('unit')
-            cider.price = float(self.request.get('price'))
+            price = self.request.get('price')
             cider.stores = [ndb.Key(urlsafe=x) for x in self.request.get_all('stores[]')]
-            cider.put()
-            self.template_values['message'] = cider.name + ' has been updated'
+            if cider.name and cider.rating and size and cider.unit and price and cider.stores:
+                cider.size = int(size)
+                cider.price = float(price)
+                cider.put()
+            else:
+                self.template_values['message'] = 'All fields must be complete except notes.'
         else:
             self.template_values['message'] = 'Action ' + action + ' is unknown'
         self.render('form.html')
