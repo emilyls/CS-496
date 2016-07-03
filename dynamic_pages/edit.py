@@ -44,12 +44,8 @@ class Edit(base_page.BaseHandler):
             cider.price = float(price)
             cider.stores = stores
             cider.put()
-            self.template_values['ciders'] = [{'name': x.name, 'key': x.key.urlsafe()}
-                                              for x in db_defs.Cider.query(
-                    ancestor=ndb.Key(db_defs.Cider, self.app.config.get('default-group'))).fetch()]
-            self.template_values['stores'] = [{'name': x.name, 'key': x.key.urlsafe()}
-                                          for x in db_defs.Store.query(
-                ancestor=ndb.Key(db_defs.Store, self.app.config.get('default-group'))).fetch()]
+            self.template_values['ciders'] = [{'name': x.name, 'key': x.key.urlsafe()} for x in db_defs.Cider.query(ancestor=ndb.Key(db_defs.Cider, self.app.config.get('default-group'))).fetch()]
+            self.template_values['stores'] = [{'name': x.name, 'key': x.key.urlsafe()} for x in db_defs.Store.query(ancestor=ndb.Key(db_defs.Store, self.app.config.get('default-group'))).fetch()]
             self.template_values['message'] = cider.name + ' has been updated'
             self.render('form.html', self.template_values)
         else:

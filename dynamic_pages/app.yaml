@@ -1,7 +1,7 @@
 # This must be the project id on cloud.google.com
-application: dynamic-pages
+application: dynamic-pages-1360
 # The version here is what will be set to the default by update.bat and shown on appspot
-version: 4
+version: 2
 # The following three will be the same for all projects
 runtime: python27
 api_version: 1
