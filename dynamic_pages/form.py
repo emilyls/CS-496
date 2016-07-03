@@ -38,17 +38,6 @@ class Add(base_page.BaseHandler):
                 cider.put()
                 self.template_values['message'] = 'Added your review of ' + cider.name
             else:
-                # cider.size = size
-                # cider.price = price
-                # stores = db_defs.Store.query(ancestor=ndb.Key(db_defs.Store, self.app.config.get('default-group')))
-                # store_boxes = []
-                # for s in stores:
-                #     if s.key in cider.stores:
-                #         store_boxes.append({'name': s.name, 'key': s.key.urlsafe(), 'checked': True})
-                #     else:
-                #         store_boxes.append({'name': s.name, 'key': s.key.urlsafe(), 'checked': False})
-                # self.template_values['stores'] = store_boxes
-                # self.template_values['cider'] = cider
                 self.template_values['message'] = 'All fields must be complete except notes.'
         elif action == 'add_store':
             k = ndb.Key(db_defs.Store, self.app.config.get('default-group'))
