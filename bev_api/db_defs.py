@@ -43,5 +43,5 @@ class Price(Model):
 class Store(ndb.Model):
     name = ndb.StringProperty(required=True)
     address = ndb.StructuredProperty(Address, required=True)
-    price = ndb.StructuredProperty(Price, required=True)
+    price = ndb.StructuredProperty(Price)
 

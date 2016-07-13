@@ -30,6 +30,7 @@ class Bev(webapp2.RequestHandler):
             for r in ratings:
                 new_rating = db_defs.Rating()
                 new_rating.value = int(r)
+                # TODO fix ratings
                 # new_rating.value = r['value']
                 # new_rating.notes = r['notes']
                 new_bev.ratings.append(new_rating)
@@ -39,34 +40,34 @@ class Bev(webapp2.RequestHandler):
         self.response.write(json.dumps(out))
         return
 
-    def get(self, **kwargs):
-        if 'application/json' not in self.request.accept:
-            self.response.status = 400  # bad request
-            self.response.status_message = "Invalid Request: This API only supports JSON"
-            return
+    # def get(self, **kwargs):
+    #     if 'application/json' not in self.request.accept:
+    #         self.response.status = 400  # bad request
+    #         self.response.status_message = "Invalid Request: This API only supports JSON"
+    #         return
+    #
+    #     if 'id' in kwargs:
+    #         out = ndb.Key(db_defs.Beverage, int(kwargs['id'])).get().to_dict()
+    #         self.response.write(json.dumps(out))
+    #     else:
+    #         q = db_defs.Beverage.query()
+    #         keys = q.fetch(keys_only=True)
+    #         results = {'keys': [x.id() for x in keys]}
+    #         self.response.write(json.dumps(results))
 
-        if 'id' in kwargs:
-            out = ndb.Key(db_defs.Beverage, int(kwargs['id'])).get().to_dict()
-            self.response.write(json.dumps(out))
-        else:
-            q = db_defs.Beverage.query()
-            keys = q.fetch(keys_only=True)
-            results = {'keys': [x.id() for x in keys]}
-            self.response.write(json.dumps(results))
 
-
-class BevInfo(webapp2.RequestHandler):
-    def get(self, **kwargs):
-        if 'application/json' not in self.request.accept:
-            self.response.status = 400  # bad request
-            self.response.status_message = "Invalid Request: This API only supports JSON"
-            return
-
-        if 'id' in kwargs:
-            id = self.request.get('id', default_value=None)
-            beverage = db_defs.Beverage.get_by_id(id)
-            beverage.id = id
-            self.response.write(json.dumps(beverage))
+# class BevInfo(webapp2.RequestHandler):
+#     def get(self, **kwargs):
+#         if 'application/json' not in self.request.accept:
+#             self.response.status = 400  # bad request
+#             self.response.status_message = "Invalid Request: This API only supports JSON"
+#             return
+#
+#         if 'id' in kwargs:
+#             id = self.request.get('id', default_value=None)
+#             beverage = db_defs.Beverage.get_by_id(id)
+#             beverage.id = id
+#             self.response.write(json.dumps(beverage))
 
 
 class BevAll(webapp2.RequestHandler):
@@ -100,7 +101,7 @@ class BevInfo(webapp2.RedirectHandler):
         if 'id' in kwargs:
             result = ndb.Key(db_defs.Beverage, int(kwargs['id'])).get().to_dict()
 
-            # NEEDS TO PULL INFORMATION FROM STORES THAT ARE RELATED TO THE CIDER
+            # TODO NEEDS TO PULL INFORMATION FROM STORES THAT ARE RELATED TO THE CIDER
             self.response.write(json.dumps(result))
 
 

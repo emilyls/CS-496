@@ -2,11 +2,12 @@
 
 curl --data "bev_name=cidre" --data "brand_name=Stella Artois" -H "Accept: application/json" http://localhost:8080/bev
 curl --data "bev_name=test name" --data "brand_name=test brand" --data "ratings[]=4" --data "ratings[]=5" -H "Accept: application/json" http://localhost:8080/bev
-
-curl -i -X POST -H "Accept: application/json" -H "Content-Type: application/json" http://localhost:8080/bev --data "{\"bev_name\":\"Cidre\", \"brand_name\":\"Stella\", \"ratings\":[{\"value\":5, \"notes\":\"not too bad\"}]}"
+curl --data "name=Fred Meyer's" --data "address=123 Main St, Portland, OR" -H "Accept: application/json" http://localhost:8080/store
 
 ## Get all names and id for all ciders
-curl -H "Accept: application/json" http://localhost:8080/all
+curl -H "Accept: application/json" http://localhost:8080/bev/all
+
+curl -H "Accept: application/json" http://localhost:8080/store/all
 
 ## Get all info for a specific cider
 curl -H "Accept: application/json" http://localhost:8080/bev/5629499534213120
