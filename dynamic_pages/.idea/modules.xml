@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/../LectureExamples/.idea/LectureExamples.iml" filepath="$PROJECT_DIR$/../LectureExamples/.idea/LectureExamples.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../bev_api/.idea/bev_api.iml" filepath="$PROJECT_DIR$/../bev_api/.idea/bev_api.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/dynamic_pages.iml" filepath="$PROJECT_DIR$/.idea/dynamic_pages.iml" />
       <module fileurl="file://$PROJECT_DIR$/../hellocloud/.idea/hellocloud.iml" filepath="$PROJECT_DIR$/../hellocloud/.idea/hellocloud.iml" />
     </modules>
