@@ -15,10 +15,15 @@ class Rating(ndb.Model):
     notes = ndb.TextProperty()
 
 
-class Beverage(ndb.Model):
+class Beverage(Model):
     brand_name = ndb.StringProperty(required=True)
     bev_name = ndb.StringProperty(required=True)
     ratings = ndb.StructuredProperty(Rating, repeated=True)
+
+
+class Date(ndb.Model):
+    month = ndb.IntegerProperty(required=True)
+    year = ndb.IntegerProperty(required=True)
 
 
 class Address(ndb.Model):
@@ -28,21 +33,17 @@ class Address(ndb.Model):
     country = ndb.StringProperty(required=True)
 
 
-class Price(Model):
+class Price(ndb.Model):
     beverage = ndb.KeyProperty(required=True)
     price = ndb.FloatProperty(required=True)
-    date = ndb.DateProperty(required=True)
-    size = ndb.IntegerProperty(required=True)
+    date = ndb.StructuredProperty(Date, required=True)
+    size = ndb.FloatProperty(required=True)
     units = ndb.StringProperty(required=True)
 
-    def to_dict(self):
-        d = super(Price, self).to_dict()
-        d['beverage'] = d['beverage'].id
-        return d
 
-
-class Store(ndb.Model):
+class Store(Model):
     name = ndb.StringProperty(required=True)
     address = ndb.StructuredProperty(Address, required=True)
     price = ndb.StructuredProperty(Price, repeated=True)
+
 

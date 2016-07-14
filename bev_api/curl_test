@@ -1,17 +1,39 @@
 # Curl Tests
 
+-------------- STORES --------------
 
+# Add store
+curl -X POST -H "Accept: application/json" http://localhost:8080/Store --data "name=Fred Meyer's" --data "street=123 Main St" --data "city=Portland" --data "state=OR" --data "country=USA"
+curl -X POST -H "Accept: application/json" http://localhost:8080/Store --data "name=Trader Joe's" --data "street=555 Oak Ave" --data "city=Alexandria" --data "state=VA" --data "country=USA"
 
+# Delete Store
+curl -X DELETE -H "Accept: application/json" http://localhost:8080/Store/5157877765373952
 
+# Get Store Info - All Stores
+curl -X GET -H "Accept: application/json" http://localhost:8080/Store
 
+Get Store Info - Search criteria ID
+curl -X GET -H "Accept: application/json" http://localhost:8080/Store?id=5668600916475904
 
+Get Store Info - Search criteria
+curl -G -X GET -H "Accept: application/json" http://localhost:8080/Store --data-urlencode "city=Portland" --data-urlencode "state=OR"
 
+# Get All Store Simplified
+curl -X GET -H "Accept: application/json" http://localhost:8080/AllStoresSimple
 
+-------------- BEVERAGES --------------
 
+# Get Beverage Info - All beverages
+curl -X GET -H "Accept: application/json" http://localhost:8080/Beverage
 
+# Get Beverage Info - Search criteria
+curl -X GET -H "Accept: application/json" http://localhost:8080/Beverage?bev_name=Stella
 
+# Get Beverage Info - Search criteria ID
+curl -X GET -H "Accept: application/json" http://localhost:8080/Beverage?id=5695057915019264
 
-
+-------------- PRICES --------------
+curl -X PUT -H "Accept: application/json" http://localhost:8080/Price --data "bev_id=5681726336532480" --data "store_id=5720827718795264" --data "price=10.99" --data "month=7" --data "year=2016" --data "size=6" --data "units=bottles"
 
 
 

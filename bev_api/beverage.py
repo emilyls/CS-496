@@ -6,8 +6,8 @@ import json
 
 class Beverage(webapp2.RequestHandler):
 
+    # Creates a Beverage
     def post(self):
-        # Creates a Beverage
         if 'application/json' not in self.request.accept:
             self.response.status = 400  # bad request
             self.response.status_message = "Invalid Request: This API only supports JSON"
@@ -31,17 +31,38 @@ class Beverage(webapp2.RequestHandler):
         self.response.write(json.dumps(out))
         return
 
-    def get(self, **kwargs):
+    # Returns search results
+    def get(self):
         if 'application/json' not in self.request.accept:
             self.response.status = 400  # bad request
             self.response.status_message = "Invalid Request: This API only supports JSON"
             return
-        if 'id' in kwargs:
-            result = ndb.Key(db_defs.Beverage, int(kwargs['id'])).get().to_dict()
 
-            # TODO NEEDS TO PULL INFORMATION FROM STORES THAT ARE RELATED TO THE CIDER
-            # TODO Filter by other optional search terms
-            self.response.write(json.dumps(result))
+        # Check if an ID is being used to pull a specific beverage
+        bev_id = self.request.get('id', default_value=None)
+        if bev_id:
+            beverage = ndb.Key(db_defs.Beverage, int(bev_id)).get()
+            results = beverage.to_dict()
+            results['id'] = bev_id
+        # Handle all other searches
+        else:
+            # Pull all beverages from database
+            query = db_defs.Beverage.query()
+            # Filter query for search terms
+            brand_name = self.request.get('brand_name', default_value=None)
+            bev_name = self.request.get('bev_name', default_value=None)
+            if brand_name:
+                query = query.filter(db_defs.Beverage.brand_name == brand_name)
+            if bev_name:
+                query = query.filter(db_defs.Beverage.bev_name == bev_name)
+            # Prepare for JSON and add ID so that users can more easily find entries
+            results = []
+            for q in query:
+                b = q.to_dict()
+                b['id'] = q.key.id()
+                results.append(b)
+        # Return results
+        self.response.write(json.dumps(results))
 
     def delete(self, **kwargs):
         if 'application/json' not in self.request.accept:
