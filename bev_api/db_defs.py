@@ -22,9 +22,10 @@ class Beverage(ndb.Model):
 
 
 class Address(ndb.Model):
-    street = ndb.StringProperty()
+    street = ndb.StringProperty(required=True)
     city = ndb.StringProperty(required=True)
     state = ndb.StringProperty(required=True)
+    country = ndb.StringProperty(required=True)
 
 
 class Price(Model):
@@ -43,5 +44,5 @@ class Price(Model):
 class Store(ndb.Model):
     name = ndb.StringProperty(required=True)
     address = ndb.StructuredProperty(Address, required=True)
-    price = ndb.StructuredProperty(Price)
+    price = ndb.StructuredProperty(Price, repeated=True)
 

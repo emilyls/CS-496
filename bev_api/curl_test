@@ -1,5 +1,21 @@
 # Curl Tests
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#################################
 curl --data "bev_name=cidre" --data "brand_name=Stella Artois" -H "Accept: application/json" http://localhost:8080/bev
 curl --data "bev_name=test name" --data "brand_name=test brand" --data "ratings[]=4" --data "ratings[]=5" -H "Accept: application/json" http://localhost:8080/bev
 curl --data "name=Fred Meyer's" --data "address=123 Main St, Portland, OR" -H "Accept: application/json" http://localhost:8080/store
@@ -11,6 +27,9 @@ curl -H "Accept: application/json" http://localhost:8080/store/all
 
 ## Get all info for a specific cider
 curl -H "Accept: application/json" http://localhost:8080/bev/5629499534213120
+
+# Delete a beverage by ID
+curl -X DELETE -H "Accept: application/json" http://localhost:8080/bevdelete/5629499534213120
 
 
 # curl --data-urlencode "name=Test Channel" --data-urlencode "topics[]=topic1" --data-urlencode "topics[]=topic 2" -d "mods[]=1234 -d "mods[]=2345" -H "Accept: application/json" http://localhost:8080/channel
