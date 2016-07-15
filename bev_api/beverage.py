@@ -26,9 +26,8 @@ class Beverage(webapp2.RequestHandler):
             return
 
         key = new_bev.put()
-        out = new_bev.to_dict()
-        new_bev['id'] = key
-        self.response.write(json.dumps(out))
+        if key:
+            self.response.write(json.dumps(new_bev.to_dict()))
         return
 
     # Returns search results
@@ -39,12 +38,14 @@ class Beverage(webapp2.RequestHandler):
             return
 
         # Check if an ID is being used to pull a specific beverage
+        results = {}
         bev_id = self.request.get('id', default_value=None)
         if bev_id:
             beverage = ndb.Key(db_defs.Beverage, int(bev_id)).get()
-            results = beverage.to_dict()
-            # results['id'] = bev_id
+            if beverage:
+                results = beverage.to_dict()
         # Handle all other searches
+        #TODO change to AND for query filter instead of OR
         else:
             # Pull all beverages from database
             query = db_defs.Beverage.query()
@@ -59,7 +60,6 @@ class Beverage(webapp2.RequestHandler):
             results = []
             for q in query:
                 b = q.to_dict()
-                # b['id'] = q.key.id()
                 results.append(b)
         # Return results
         self.response.write(json.dumps(results))
@@ -70,9 +70,22 @@ class Beverage(webapp2.RequestHandler):
             self.response.status_message = "Invalid Request: This API only supports JSON"
             return
         if 'id' in kwargs:
-            ndb.Key(db_defs.Beverage, int(kwargs['id'])).delete()
+            bev_id = int(kwargs['id'])
+            bev_key = ndb.Key(db_defs.Beverage, int(bev_id))
+            if bev_key:
+                # Delete all references to the the beverage in the store price lists
+                query = db_defs.Store.query()
+                query = query.filter(db_defs.Store.price.beverage == bev_key)
+                if query:
+                    for q in query:
+                        price = q.price
+                        for p in price:
+                            if p.beverage == bev_key:
+                                q.price.remove(p)
+                        q.put()
 
-            # TODO delete all store references to the beverage
+                # Delete beverage entity
+                ndb.Key(db_defs.Beverage, bev_id).delete()
 
 
 class AllBeveragesSimple(webapp2.RequestHandler):
@@ -84,7 +97,6 @@ class AllBeveragesSimple(webapp2.RequestHandler):
             return
 
         query = db_defs.Beverage.query()
-        query = query.fetch(projection=[db_defs.Beverage.bev_name, db_defs.Beverage.brand_name])
         results = []
         for x in query:
             bev = {}
@@ -113,10 +125,13 @@ class Rating(webapp2.RequestHandler):
                 new_rating.notes = notes
 
             beverage = ndb.Key(db_defs.Beverage, int(bev_id)).get()
-            beverage.ratings.append(new_rating)
-            key = beverage.put()
-            out = beverage.to_dict()
-            self.response.write(json.dumps(out))
+            if beverage:
+                beverage.ratings.append(new_rating)
+                key = beverage.put()
+                out = beverage.to_dict()
+                self.response.write(json.dumps(out))
+            else:
+                self.response.status_message = "Invalid Request: beverage does not exist"
 
         else:
             self.response.status = 400  # bad request

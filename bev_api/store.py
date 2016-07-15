@@ -2,7 +2,6 @@ import webapp2
 from google.appengine.ext import ndb
 import db_defs
 import json
-import datetime
 
 
 class Store(webapp2.RequestHandler):
@@ -29,17 +28,13 @@ class Store(webapp2.RequestHandler):
             new_address.state = state
             new_address.country = country
             new_store.address = new_address
+            key = new_store.put()
+            if key:
+                self.response.write(json.dumps(new_store.to_dict()))
         else:
             self.response.status = 400  # bad request
             self.response.status_message = "Invalid Request"
-            return
 
-        # TODO: Handle prices
-
-        key = new_store.put()
-        out = new_store.to_dict()
-        out['id'] = key.id()
-        self.response.write(json.dumps(out))
         return
 
     def get(self):
@@ -50,10 +45,11 @@ class Store(webapp2.RequestHandler):
 
         # Check if an ID is being used to pull a specific store
         store_id = self.request.get('id', default_value=None)
+        results = {}
         if store_id:
             store = ndb.Key(db_defs.Store, int(store_id)).get()
-            results = store.to_dict()
-            results['id'] = store_id
+            if store:
+                results = store.to_dict()
         else:
             # Pull all stores from database
             query = db_defs.Store.query()
@@ -79,7 +75,8 @@ class Store(webapp2.RequestHandler):
             bev_id = self.request.get('bev_id', default_value=None)
             if bev_id:
                 bev_key = ndb.Key(db_defs.Beverage, int(bev_id))
-                query = query.filter(db_defs.Store.price.beverage == bev_key)
+                if bev_key:
+                    query = query.filter(db_defs.Store.price.beverage == bev_key)
 
             brand_name = self.request.get('brand_name', default_value=None)
             bev_name = self.request.get('bev_name', default_value=None)
@@ -152,15 +149,35 @@ class Price(webapp2.RequestHandler):
             new_price.date = new_date
 
             beverage = ndb.Key(db_defs.Beverage, int(bev_id)).get()
-            new_price.beverage = beverage.key
             store = ndb.Key(db_defs.Store, int(store_id)).get()
-            store.price.append(new_price)
+            if beverage and store:
+                new_price.beverage = beverage.key
+                store.price.append(new_price)
 
-            key = store.put()
-            out = store.to_dict()
-            self.response.write(json.dumps(out))
+                key = store.put()
+                if key:
+                    self.response.write(json.dumps(store.to_dict()))
         else:
             self.response.status = 400  # bad request
             self.response.status_message = "Invalid Request"
 
+        return
+
+
+class StoreDeleteBeverage(webapp2.RequestHandler):
+    def delete(self, **kwargs):
+        if 'application/json' not in self.request.accept:
+            self.response.status = 400  # bad request
+            self.response.status_message = "Invalid Request: This API only supports JSON"
+            return
+        if ('sid' in kwargs) and ('bid' in kwargs):
+            store = ndb.Key(db_defs.Store, int(kwargs['sid'])).get()
+            beverage = ndb.Key(db_defs.Beverage, int(kwargs['bid'])).get()
+            if store and beverage:
+                for p in store.price:
+                    if p.beverage == beverage.key:
+                        store.price.remove(p)
+                key = store.put()
+                if key:
+                    self.response.write(json.dumps(store.to_dict()))
         return

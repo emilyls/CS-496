@@ -5,6 +5,7 @@
 # Add store
 curl -X POST -H "Accept: application/json" http://localhost:8080/Store --data "name=Fred Meyer's" --data "street=123 Main St" --data "city=Portland" --data "state=OR" --data "country=USA"
 curl -X POST -H "Accept: application/json" http://localhost:8080/Store --data "name=Trader Joe's" --data "street=555 Oak Ave" --data "city=Alexandria" --data "state=VA" --data "country=USA"
+curl -X POST -H "Accept: application/json" http://localhost:8080/Store --data "name=Whole Food's" --data "street=1st Another St" --data "city=Hillsboro" --data "state=OR" --data "country=USA"
 
 # Delete Store
 curl -X DELETE -H "Accept: application/json" http://localhost:8080/Store/5157877765373952
@@ -17,7 +18,7 @@ curl -X GET -H "Accept: application/json" http://localhost:8080/Store?id=5668600
 
 Get Store Info - Search criteria
 curl -G -X GET -H "Accept: application/json" http://localhost:8080/Store --data-urlencode "city=Portland" --data-urlencode "state=OR"
-curl -G -X GET -H "Accept: application/json" http://localhost:8080/Store --data-urlencode "bev_id=5681726336532480"
+curl -G -X GET -H "Accept: application/json" http://localhost:8080/Store --data-urlencode "bev_id=5118776383111168"
 
 # Get All Store Simplified
 curl -X GET -H "Accept: application/json" http://localhost:8080/AllStoresSimple
@@ -26,6 +27,7 @@ curl -X GET -H "Accept: application/json" http://localhost:8080/AllStoresSimple
 
 # Get Beverage Info - All beverages
 curl -X GET -H "Accept: application/json" http://localhost:8080/Beverage
+curl -X GET -H "Accept: application/json" http://localhost:8080/AllBeveragesSimple
 
 # Get Beverage Info - Search criteria
 curl -X GET -H "Accept: application/json" http://localhost:8080/Beverage?bev_name=Stella
@@ -33,12 +35,18 @@ curl -X GET -H "Accept: application/json" http://localhost:8080/Beverage?bev_nam
 # Get Beverage Info - Search criteria ID
 curl -X GET -H "Accept: application/json" http://localhost:8080/Beverage?id=5695057915019264
 
+# Delete Beverage
+curl -X DELETE -H "Accept: application/json" http://localhost:8080/Beverage/5118776383111168
+
 -------------- PRICES --------------
 curl -X PUT -H "Accept: application/json" http://localhost:8080/Price --data "bev_id=5681726336532480" --data "store_id=5720827718795264" --data "price=10.99" --data "month=7" --data "year=2016" --data "size=6" --data "units=bottles"
+curl -X PUT -H "Accept: application/json" http://localhost:8080/Price --data "bev_id=5066549580791808" --data "store_id=5662278724616192" --data "price=10.99" --data "month=7" --data "year=2016" --data "size=6" --data "units=bottles"
 
 -------------- RATINGS --------------
 curl -X PUT -H "Accept: application/json" http://localhost:8080/Rating --data "bev_id=5681726336532480" --data  "value=10" --data "notes=DELICIOUS, my favorite!"
 curl -X PUT -H "Accept: application/json" http://localhost:8080/Rating --data "bev_id=5681726336532480" --data  "value=9"
+
+curl -X DELETE -H "Accept: application/json" http://localhost:8080/StoreDeleteBeverage/5662278724616192/5066549580791808
 
 
 #################################
