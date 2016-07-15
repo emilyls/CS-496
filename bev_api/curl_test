@@ -17,6 +17,7 @@ curl -X GET -H "Accept: application/json" http://localhost:8080/Store?id=5668600
 
 Get Store Info - Search criteria
 curl -G -X GET -H "Accept: application/json" http://localhost:8080/Store --data-urlencode "city=Portland" --data-urlencode "state=OR"
+curl -G -X GET -H "Accept: application/json" http://localhost:8080/Store --data-urlencode "bev_id=5681726336532480"
 
 # Get All Store Simplified
 curl -X GET -H "Accept: application/json" http://localhost:8080/AllStoresSimple
@@ -35,6 +36,9 @@ curl -X GET -H "Accept: application/json" http://localhost:8080/Beverage?id=5695
 -------------- PRICES --------------
 curl -X PUT -H "Accept: application/json" http://localhost:8080/Price --data "bev_id=5681726336532480" --data "store_id=5720827718795264" --data "price=10.99" --data "month=7" --data "year=2016" --data "size=6" --data "units=bottles"
 
+-------------- RATINGS --------------
+curl -X PUT -H "Accept: application/json" http://localhost:8080/Rating --data "bev_id=5681726336532480" --data  "value=10" --data "notes=DELICIOUS, my favorite!"
+curl -X PUT -H "Accept: application/json" http://localhost:8080/Rating --data "bev_id=5681726336532480" --data  "value=9"
 
 
 #################################

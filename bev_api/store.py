@@ -75,23 +75,23 @@ class Store(webapp2.RequestHandler):
             if country:
                 query = query.filter(db_defs.Store.address.country == country)
 
-            # TODO Verify if Beverage info is handled appropriately
             # Beverages
+            bev_id = self.request.get('bev_id', default_value=None)
+            if bev_id:
+                bev_key = ndb.Key(db_defs.Beverage, int(bev_id))
+                query = query.filter(db_defs.Store.price.beverage == bev_key)
+
             brand_name = self.request.get('brand_name', default_value=None)
             bev_name = self.request.get('bev_name', default_value=None)
             if brand_name or bev_name:
                 bev_query = db_defs.Beverage.query()
-                bev_query = query.filter(db_defs.Beverage.brand_name == brand_name)
-                bev_query = query.filter(db_defs.Beverage.bev_name == bev_name)
+                bev_query = bev_query.filter(db_defs.Beverage.brand_name == brand_name)
+                bev_query = bev_query.filter(db_defs.Beverage.bev_name == bev_name)
                 if bev_query:
                     for bev in bev_query:
-                        query = query.filter(db_defs.Store.price.beverage == bev.key)
+                        query = query.filter(db_defs.Store.price.beverage.id() == bev.key.id())
 
-            results = []
-            for q in query:
-                s = q.to_dict()
-                s['id'] = q.key.id()
-                results.append(s)
+            results = [q.to_dict() for q in query]
 
         self.response.write(json.dumps(results))
 
@@ -113,21 +113,20 @@ class AllStoresSimple(webapp2.RequestHandler):
             return
 
         query = db_defs.Store.query()
-        query = query.fetch(projection=[db_defs.Store.name, db_defs.Store.address.street])
         results = []
         for x in query:
             store = {}
             store['name'] = x.name
-            # TODO need to get address to work
-            store['address'] = x.address.street
+            store['address'] = x.address.to_dict()
             store['id'] = x.key.id()
             results.append(store)
+
         self.response.write(json.dumps(results))
 
 
 class Price(webapp2.RequestHandler):
     def put(self):
-        # Creates a Beverage
+
         if 'application/json' not in self.request.accept:
             self.response.status = 400  # bad request
             self.response.status_message = "Invalid Request: This API only supports JSON"
@@ -159,9 +158,7 @@ class Price(webapp2.RequestHandler):
 
             key = store.put()
             out = store.to_dict()
-            out['id'] = key
             self.response.write(json.dumps(out))
-            # self.response.write(out)
         else:
             self.response.status = 400  # bad request
             self.response.status_message = "Invalid Request"

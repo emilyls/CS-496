@@ -43,7 +43,7 @@ class Beverage(webapp2.RequestHandler):
         if bev_id:
             beverage = ndb.Key(db_defs.Beverage, int(bev_id)).get()
             results = beverage.to_dict()
-            results['id'] = bev_id
+            # results['id'] = bev_id
         # Handle all other searches
         else:
             # Pull all beverages from database
@@ -59,7 +59,7 @@ class Beverage(webapp2.RequestHandler):
             results = []
             for q in query:
                 b = q.to_dict()
-                b['id'] = q.key.id()
+                # b['id'] = q.key.id()
                 results.append(b)
         # Return results
         self.response.write(json.dumps(results))
@@ -97,28 +97,29 @@ class AllBeveragesSimple(webapp2.RequestHandler):
 
 class Rating(webapp2.RequestHandler):
     def put(self):
-        # Creates a Beverage
+
         if 'application/json' not in self.request.accept:
             self.response.status = 400  # bad request
             self.response.status_message = "Invalid Request: This API only supports JSON"
             return
 
-        new_rating = db_defs.Rating()
-        bev_id = self.request.get('id', default_value=None)
+        bev_id = self.request.get('bev_id', default_value=None)
         value = self.request.get('value', default_value=None)
-        notes = self.request.get('notes', default_value=None)
-
         if bev_id and value:
-            new_rating.value = value
+            new_rating = db_defs.Rating()
+            new_rating.value = int(value)
+            notes = self.request.get('notes', default_value=None)
             if notes:
                 new_rating.notes = notes
+
+            beverage = ndb.Key(db_defs.Beverage, int(bev_id)).get()
+            beverage.ratings.append(new_rating)
+            key = beverage.put()
+            out = beverage.to_dict()
+            self.response.write(json.dumps(out))
+
         else:
             self.response.status = 400  # bad request
             self.response.status_message = "Invalid Request"
-            return
-        beverage = ndb.Key(db_defs.Beverage, int(bev_id)).get()
-        beverage.rating.append(new_rating)
-        key = beverage.put()
-        out = beverage.to_dict()
-        self.response.write(json.dumps(out))
+
         return
