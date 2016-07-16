@@ -2,14 +2,8 @@ from google.appengine.ext import ndb
 
 
 class Rating(ndb.Model):
-    value = ndb.IntegerProperty(required=True)
+    value = ndb.FloatProperty(required=True)
     notes = ndb.TextProperty()
-    #
-    # def to_dict(self):
-    #     d = {}
-    #     d['value'] = self.value
-    #     d['notes'] = self.notes
-    #     return d
 
 
 class Beverage(ndb.Model):
@@ -25,16 +19,18 @@ class Beverage(ndb.Model):
         d['id'] = self.key.id()
         return d
 
+    def to_simple_dict(self):
+        d = {}
+        d['brand_name'] = self.brand_name
+        d['bev_name'] = self.bev_name
+        d['id'] = self.key.id()
+        return d
+
 
 class Date(ndb.Model):
+    day = ndb.IntegerProperty(required=True)
     month = ndb.IntegerProperty(required=True)
     year = ndb.IntegerProperty(required=True)
-
-    # def to_dict(self):
-    #     d = {}
-    #     d['month'] = self.month
-    #     d['year'] = self.year
-    #     return d
 
 
 class Address(ndb.Model):
@@ -42,14 +38,6 @@ class Address(ndb.Model):
     city = ndb.StringProperty(required=True)
     state = ndb.StringProperty(required=True)
     country = ndb.StringProperty(required=True)
-
-    # def to_dict(self):
-    #     d = {}
-    #     d['street'] = self.street
-    #     d['city'] = self.city
-    #     d['state'] = self.state
-    #     d['country'] = self.country
-    #     return d
 
 
 class Price(ndb.Model):
@@ -82,3 +70,9 @@ class Store(ndb.Model):
         d['id'] = self.key.id()
         return d
 
+    def to_simple_dict(self):
+        d = {}
+        d['name'] = self.name
+        d['address'] = self.address.to_dict()
+        d['id'] = self.key.id()
+        return d

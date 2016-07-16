@@ -21,13 +21,16 @@ class Beverage(webapp2.RequestHandler):
             new_bev.brand_name = brand_name
             new_bev.bev_name = bev_name
         else:
-            self.response.status = 400  # bad request
+            self.response.status = 400
             self.response.status_message = "Invalid Request"
             return
 
         key = new_bev.put()
         if key:
             self.response.write(json.dumps(new_bev.to_dict()))
+        else:
+            self.response.status = 500
+            self.response.status_message = "Internal Server Error"
         return
 
     # Returns search results
@@ -37,33 +40,35 @@ class Beverage(webapp2.RequestHandler):
             self.response.status_message = "Invalid Request: This API only supports JSON"
             return
 
-        # Check if an ID is being used to pull a specific beverage
-        results = {}
+        # Pull all beverages from database
+        query = db_defs.Beverage.query()
+        # Filter query for search terms
+        brand_name = self.request.get('brand_name', default_value=None)
+        bev_name = self.request.get('bev_name', default_value=None)
         bev_id = self.request.get('id', default_value=None)
         if bev_id:
-            beverage = ndb.Key(db_defs.Beverage, int(bev_id)).get()
-            if beverage:
-                results = beverage.to_dict()
-        # Handle all other searches
-        #TODO change to AND for query filter instead of OR
-        else:
-            # Pull all beverages from database
-            query = db_defs.Beverage.query()
-            # Filter query for search terms
-            brand_name = self.request.get('brand_name', default_value=None)
-            bev_name = self.request.get('bev_name', default_value=None)
-            if brand_name:
-                query = query.filter(db_defs.Beverage.brand_name == brand_name)
-            if bev_name:
-                query = query.filter(db_defs.Beverage.bev_name == bev_name)
-            # Prepare for JSON and add ID so that users can more easily find entries
-            results = []
-            for q in query:
-                b = q.to_dict()
-                results.append(b)
+            # Make sure bev_id is a valid integer
+            try:
+                bev_id = int(bev_id)
+            except ValueError:
+                self.response.status = 400
+                self.response.status_message = "Invalid Request: invalid bev_id"
+                return
+            bev_key = ndb.Key(db_defs.Beverage, bev_id)
+            query = query.filter(db_defs.Beverage.key == bev_key)
+        if brand_name:
+            query = query.filter(db_defs.Beverage.brand_name == brand_name)
+        if bev_name:
+            query = query.filter(db_defs.Beverage.bev_name == bev_name)
+        # Prepare for JSON
+        results = []
+        for q in query:
+            b = q.to_dict()
+            results.append(b)
         # Return results
         self.response.write(json.dumps(results))
 
+    # Deletes a beverage and all references to it in the store entities
     def delete(self, **kwargs):
         if 'application/json' not in self.request.accept:
             self.response.status = 400  # bad request
@@ -71,7 +76,7 @@ class Beverage(webapp2.RequestHandler):
             return
         if 'id' in kwargs:
             bev_id = int(kwargs['id'])
-            bev_key = ndb.Key(db_defs.Beverage, int(bev_id))
+            bev_key = ndb.Key(db_defs.Beverage, bev_id)
             if bev_key:
                 # Delete all references to the the beverage in the store price lists
                 query = db_defs.Store.query()
@@ -86,6 +91,9 @@ class Beverage(webapp2.RequestHandler):
 
                 # Delete beverage entity
                 ndb.Key(db_defs.Beverage, bev_id).delete()
+        else:
+            self.response.status = 400
+            self.response.status_message = "Invalid Request: must specify id"
 
 
 class AllBeveragesSimple(webapp2.RequestHandler):
@@ -97,19 +105,13 @@ class AllBeveragesSimple(webapp2.RequestHandler):
             return
 
         query = db_defs.Beverage.query()
-        results = []
-        for x in query:
-            bev = {}
-            bev['bev_name'] = x.bev_name
-            bev['brand_name'] = x.brand_name
-            bev['id'] = x.key.id()
-            results.append(bev)
+        results = [q.to_simple_dict() for q in query]
         self.response.write(json.dumps(results))
 
 
 class Rating(webapp2.RequestHandler):
-    def put(self):
 
+    def put(self):
         if 'application/json' not in self.request.accept:
             self.response.status = 400  # bad request
             self.response.status_message = "Invalid Request: This API only supports JSON"
@@ -119,18 +121,41 @@ class Rating(webapp2.RequestHandler):
         value = self.request.get('value', default_value=None)
         if bev_id and value:
             new_rating = db_defs.Rating()
-            new_rating.value = int(value)
+            # Make sure the value is a valid float in the needed range
+            try:
+                new_rating.value = float(value)
+                if new_rating.value < 0 or new_rating.value > 10:
+                    self.response.status = 400
+                    self.response.status_message = "Invalid Request: value out of range"
+                    return
+            except ValueError:
+                self.response.status = 400
+                self.response.status_message = "Invalid Request: invalid value"
+                return
             notes = self.request.get('notes', default_value=None)
             if notes:
                 new_rating.notes = notes
 
+            # Make sure the beverage id is a valid integer
+            try:
+                bev_id = int(bev_id)
+            except ValueError:
+                self.response.status = 400
+                self.response.status_message = "Invalid Request: invalid value"
+                return
             beverage = ndb.Key(db_defs.Beverage, int(bev_id)).get()
+            # Make sure that the beverage exists
             if beverage:
                 beverage.ratings.append(new_rating)
                 key = beverage.put()
-                out = beverage.to_dict()
-                self.response.write(json.dumps(out))
+                if key:
+                    self.response.write(json.dumps(beverage.to_dict()))
+                else:
+                    self.response.status = 500
+                    self.response.status_message = "Internal Server Error"
+
             else:
+                self.response.status = 400
                 self.response.status_message = "Invalid Request: beverage does not exist"
 
         else:
