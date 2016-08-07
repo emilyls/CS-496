@@ -1,6 +1,11 @@
 from google.appengine.ext import ndb
 
 
+class User(ndb.Model):
+    user_id = ndb.StringProperty(required=True)
+    user_name = ndb.StringProperty(required=True)
+
+
 class Rating(ndb.Model):
     value = ndb.FloatProperty(required=True)
     notes = ndb.TextProperty()

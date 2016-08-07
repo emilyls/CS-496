@@ -1,7 +1,7 @@
 # This must be the project id on cloud.google.com
 application: bev-api
 # The version here is what will be set to the default by update.bat and shown on appspot
-version: 1
+version: 2
 # The following three will be the same for all projects
 runtime: python27
 api_version: 1
