@@ -1,13 +1,24 @@
 from google.appengine.ext import ndb
 
 
+class Favorite(ndb.Model):
+    bev_key = ndb.KeyProperty(required=True)
+    user_notes = ndb.StringProperty()
+
+    def to_dict(self):
+        d = {}
+        d['user_notes'] = self.notes
+        d['id'] = self.bev_key.id()
+
+
 class User(ndb.Model):
     email = ndb.StringProperty(required=True)
-    favorites = ndb.KeyProperty(repeated=True)
+    favorites = ndb.StructuredProperty(Favorite, repeated=True)
 
     def to_dict(self):
         d = {}
         d['email'] = self.email
+        d['favorites'] = [f.to_dict() for f in self.favorites]
         d['id'] = self.key.id()
         return d
 
