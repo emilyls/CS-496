@@ -2,8 +2,14 @@ from google.appengine.ext import ndb
 
 
 class User(ndb.Model):
-    user_id = ndb.StringProperty(required=True)
-    user_name = ndb.StringProperty(required=True)
+    email = ndb.StringProperty(required=True)
+    favorites = ndb.KeyProperty(repeated=True)
+
+    def to_dict(self):
+        d = {}
+        d['email'] = self.email
+        d['id'] = self.key.id()
+        return d
 
 
 class Rating(ndb.Model):
